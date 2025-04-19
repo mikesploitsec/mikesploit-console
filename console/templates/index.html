@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mikesploit console</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+    <div class="crt-container">
+        <!-- Power + Volume -->
+        <div class="controls">
+            <div class="knob power" id="power-knob" title="Power"></div>
+            <div class="knob volume" id="volume-knob" title="Volume"></div>
+        </div>
+
+        <!-- Channel Overlay Icon -->
+        <div id="channel-icon" class="channel-icon hidden">CH 01</div>
+
+        <!-- Screen Shell -->
+        <div class="crt-frame">
+            <div id="screen" class="crt-screen off">
+                <div class="screen-content">
+                    <p>Power on to begin.</p>
+                </div>
+            </div>
+
+            <!-- Physical TV Buttons -->
+            <div class="tv-buttons">
+                <button class="crt-btn" data-tab="osint" title="OSINT">🔍</button>
+                <button class="crt-btn" data-tab="recon" title="Recon">📶</button>
+                <button class="crt-btn" data-tab="enum" title="Enumeration">📁</button>
+                <button class="crt-btn" data-tab="privesc" title="Privilege Escalation">⬆️</button>
+                <button class="crt-btn" data-tab="cred" title="Credentials">🔑</button>
+                <button class="crt-btn" data-tab="root" title="Root">☠️</button>
+                <button class="crt-btn danger" data-tab="exit" title="Exit">🚪</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="power-sound" src="/static/power-on.mp3"></audio>
+    <audio id="hum-sound" src="/static/hum.mp3" loop></audio>
+
+    <script>
+        const powerKnob = document.getElementById('power-knob');
+        const volumeKnob = document.getElementById('volume-knob');
+        const screen = document.getElementById('screen');
+        const channelIcon = document.getElementById('channel-icon');
+        const powerSound = document.getElementById('power-sound');
+        const humSound = document.getElementById('hum-sound');
+        let poweredOn = false;
+
+        powerKnob.addEventListener('click', () => {
+            if (!poweredOn) {
+                screen.classList.remove('off');
+                screen.classList.add('booting');
+                powerSound.play();
+                setTimeout(() => {
+                    screen.classList.remove('booting');
+                    screen.classList.add('on');
+                    humSound.volume = 0.5;
+                    humSound.play();
+                    screen.querySelector('.screen-content').innerHTML = '<p>Main menu loaded.</p>';
+                }, 1500);
+                poweredOn = true;
+            }
+        });
+
+        volumeKnob.addEventListener('input', (e) => {
+            humSound.volume = e.target.value;
+        });
+
+        document.querySelectorAll('.crt-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!poweredOn) return;
+                const tab = btn.dataset.tab;
+                channelIcon.textContent = tab.toUpperCase();
+                channelIcon.classList.remove('hidden');
+                setTimeout(() => channelIcon.classList.add('hidden'), 2000);
+                screen.querySelector('.screen-content').innerHTML = `<p>Channel ${tab.toUpperCase()} selected.</p>`;
+            });
+        });
+    </script>
+</body>
+
+</html>
