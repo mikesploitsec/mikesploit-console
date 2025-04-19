@@ -1,0 +1,21 @@
+services:
+  proxy:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - console
+    networks:
+      - mikesploit_net
+
+  console:
+    build: ./console
+    expose:
+      - "6969"
+    environment:
+      - FLASK_APP=run.py
+    networks:
+      - mikesploit_net
+
+networks:
+  mikesploit_net:
