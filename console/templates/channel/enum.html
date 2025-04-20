@@ -1,0 +1,38 @@
+<h2>Enumeration Menu</h2>
+
+<form id="enum-form">
+    <label for="target">Target IP/Domain:</label><br>
+    <input type="text" id="target" name="target" placeholder="e.g. 10.10.11.111" required><br><br>
+
+    <fieldset>
+        <legend>Select tools to run:</legend>
+        <label><input type="checkbox" name="tools" value="nmap"> Nmap</label><br>
+        <label><input type="checkbox" name="tools" value="nikto"> Nikto</label><br>
+        <label><input type="checkbox" name="tools" value="dirb"> Dirb</label><br>
+        <label><input type="checkbox" name="tools" value="enum4linux"> Enum4linux</label>
+    </fieldset><br>
+
+    <button type="submit">Launch Scan</button>
+</form>
+
+<pre id="enum-output"></pre>
+
+<script>
+    document.getElementById('enum-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const target = form.target.value;
+        const tools = Array.from(form.tools)
+            .filter(box => box.checked)
+            .map(box => box.value);
+
+        const res = await fetch("/launch-enum", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target, tools })
+        });
+
+        const data = await res.text();
+        document.getElementById('enum-output').textContent = data;
+    });
+</script>
